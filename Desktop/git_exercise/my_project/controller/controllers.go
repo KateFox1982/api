@@ -22,6 +22,7 @@ type UserCtrl struct {
 //	Name string `json:"name"`
 //	Sale int    `json:"sale"`
 //}
+var usr = &model.UserModel{}
 
 func NewUserCtrl([]model.User) *UserCtrl {
 

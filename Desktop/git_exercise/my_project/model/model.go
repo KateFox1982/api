@@ -6,11 +6,6 @@ import (
 	"log"
 )
 
-//type User struct {
-//	ID   int
-//	Name string
-//	Sale int
-//}
 type User struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
@@ -27,7 +22,6 @@ type UserModel struct {
 //		name,
 //		sale,
 //	}
-//}
 
 func (m *UserModel) Getusers() ([]User, error) {
 	var rows, err = m.DB.Query("SELECT * FROM Misha2")

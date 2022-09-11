@@ -9,6 +9,7 @@ import (
 )
 
 //var DB *sql.DB
+var userCrt = &controller.UserCtrl{}
 
 type UserDB struct {
 	users controller.UserCtrl
@@ -30,7 +31,6 @@ func main() {
 	router.HandleFunc("/user/{id}", us.DeleteUser).Methods("DELETE")
 	router.HandleFunc("/user", us.UpdateUser).Methods("PUT")
 	log.Fatal(http.ListenAndServe("127.0.0.1:4000", router))
-
 }
 func (us *UserDB) Getusers(res http.ResponseWriter, req *http.Request) {
 	us.Getusers(res, req)
@@ -39,7 +39,6 @@ func (us *UserDB) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 	us.GetSingleUser(res, req)
 }
 func (us *UserDB) CreateUser(res http.ResponseWriter, req *http.Request) {
-
 	us.CreateUser(res, req)
 }
 func (us *UserDB) DeleteUser(res http.ResponseWriter, req *http.Request) {
