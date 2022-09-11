@@ -111,7 +111,5 @@ func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	json.NewEncoder(res).Encode(p)
-
 }

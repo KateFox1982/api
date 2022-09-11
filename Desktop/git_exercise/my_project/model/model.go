@@ -32,7 +32,6 @@ func (m *UserModel) Getusers() ([]User, error) {
 	users := []User{}
 	for rows.Next() {
 		p := User{}
-
 		err := rows.Scan(&p.ID, &p.Name, &p.Sale)
 		if err != nil {
 			fmt.Println(err)
