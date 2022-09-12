@@ -14,7 +14,7 @@ import (
 
 type UserCtrl struct {
 	users model.UserModel
-	DB    *sql.DB
+	//DB    *sql.DB
 }
 
 //type User struct {
@@ -24,7 +24,7 @@ type UserCtrl struct {
 //}
 var usr = &model.UserModel{}
 
-func NewUserCtrl([]model.User) *UserCtrl {
+func NewUserCtrl(*sql.DB) *UserCtrl {
 
 	return &UserCtrl{}
 }
@@ -34,10 +34,15 @@ func (usr *UserCtrl) Getusers(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	users, err := usr.users.Getusers()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Got error in mysql connector: %s", err)
+		return
 	}
-	p := NewUserCtrl(users)
-	json.NewEncoder(res).Encode(&p)
+	//p,err := usr.users.Getusers()
+	//if err != nil {
+	//	http.Error(res, err.Error(), http.StatusBadRequest)
+	//	return
+	//}
+	json.NewEncoder(res).Encode(&users)
 }
 
 func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
@@ -47,12 +52,13 @@ func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 	var id = params["id"]
 	s, err := strconv.Atoi(id)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
+		return
 	}
 
 	p, err := usr.users.GetSingleUser(s)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
 		return
 	}
 
@@ -67,13 +73,15 @@ func (usr *UserCtrl) CreateUser(res http.ResponseWriter, req *http.Request) {
 	var user model.User
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		log.Printf("Got error in mysql connector: %s", err)
 		return
 	}
 
 	m, err := usr.users.CreateUser(user.Name, user.Sale)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
+
 		return
 	}
 	json.NewEncoder(res).Encode(&m)
@@ -84,12 +92,12 @@ func (usr *UserCtrl) UpdateUser(res http.ResponseWriter, req *http.Request) {
 	var user model.User
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
 		return
 	}
 	users, err := usr.users.UpdateUser(user.ID, user.Name, user.Sale)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
 		return
 	}
 
@@ -104,11 +112,12 @@ func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
 	id := params["id"]
 	s, err := strconv.Atoi(id)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
+		return
 	}
 	p, err := usr.users.DeleteUser(s)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		log.Printf("Got error in mysql connector: %s", err)
 		return
 	}
 	json.NewEncoder(res).Encode(p)

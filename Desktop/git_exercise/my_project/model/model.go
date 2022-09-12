@@ -24,9 +24,11 @@ type UserModel struct {
 //	}
 
 func (m *UserModel) Getusers() ([]User, error) {
+	//goland:noinspection ALL
 	var rows, err = m.DB.Query("SELECT * FROM Misha2")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Ошибка в модели ")
+		return nil, err
 	}
 	defer rows.Close()
 	users := []User{}
@@ -34,8 +36,8 @@ func (m *UserModel) Getusers() ([]User, error) {
 		p := User{}
 		err := rows.Scan(&p.ID, &p.Name, &p.Sale)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			log.Fatal("Ошибка в модели ")
+			return nil, err
 		}
 		users = append(users, p)
 	}
@@ -44,6 +46,7 @@ func (m *UserModel) Getusers() ([]User, error) {
 func (m *UserModel) GetSingleUser(id int) (User, error) {
 	var p User
 
+	//goland:noinspection SqlResolve
 	row1 := m.DB.QueryRow("SELECT id, name, sale FROM Misha2 where id=$1", id)
 
 	err := row1.Scan(&p.ID, &p.Name, &p.Sale)
@@ -52,9 +55,8 @@ func (m *UserModel) GetSingleUser(id int) (User, error) {
 		return p, err
 		//	//else if err != nil {
 		//	//	fmt.Println("Unexpected error: ", err.Error())
-	} else {
-		return p, nil
 	}
+
 	return p, err
 }
 func (m *UserModel) CreateUser(name string, sale int) (User, error) {
