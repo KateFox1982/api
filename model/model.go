@@ -15,13 +15,12 @@ type UserModel struct {
 	DB *sql.DB
 }
 
-//func NewModel(id int, name string, sale int) *Model {
-//
-//	return &Model{
-//		id,
-//		name,
-//		sale,
-//	}
+func NewUserModel(DB *sql.DB) *UserModel {
+	return &UserModel{
+		DB: DB,
+	}
+}
+
 //метод модели по получению всех пользователей из БД
 func (m *UserModel) Getusers() ([]User, error) {
 	var rows, err = m.DB.Query("SELECT id, name, sale FROM Misha2")
