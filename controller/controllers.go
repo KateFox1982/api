@@ -17,13 +17,7 @@ type UserCtrl struct {
 	users *model.UserModel
 }
 
-//type User struct {
-//	Id   int    `json:"id"`
-//	Name string `json:"name"`
-//	Sale int    `json:"sale"`
-//}
-var usr = &model.UserModel{}
-
+//конструктор контроллера
 func NewUserCtrl(DB *sql.DB) *UserCtrl {
 	return &UserCtrl{
 		users: &model.UserModel{
@@ -31,22 +25,19 @@ func NewUserCtrl(DB *sql.DB) *UserCtrl {
 	}
 }
 
+//метод контроллера по получения всех значений из БД
 func (usr *UserCtrl) Getusers(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set("Content-Type", "application/json")
 	users, err := usr.users.Getusers()
 	if err != nil {
-		log.Printf("Got error in mysql connector: %s", err)
+		log.Printf("Ошибка выполнеия функции получения информации о всех пользователях: %s", err)
 		return
 	}
-	//p,err := usr.users.Getusers()
-	//if err != nil {
-	//	http.Error(res, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
 	json.NewEncoder(res).Encode(&users)
 }
 
+//метод контроллера по получению значения по id
 func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(req) // we are extracting 'id' of the Course which we are passing in the url
@@ -54,47 +45,47 @@ func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 	var id = params["id"]
 	s, err := strconv.Atoi(id)
 	if err != nil {
-		log.Printf("Got error in mysql connector: %s", err)
+		log.Printf("Ошибка перевода id из string в int %s", err)
 		return
 	}
 
 	p, err := usr.users.GetSingleUser(s)
 	if err != nil {
-		log.Printf("Got error in mysql connector: %s", err)
+		log.Printf("Ошибка выполнения функции выбора по id: %s", err)
 		return
 	}
 
 	json.NewEncoder(res).Encode(&p)
 
 }
+
+//метод контроллера по созданию нового элемента в БД
 func (usr *UserCtrl) CreateUser(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set("Content-Type", "application/json")
-	//
-	//var param model.User
 	var user model.User
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
 
-		log.Fatal(err)
+		log.Printf("Ошибка чтения информации для сздания новой записи : %s", err)
 		return
 	}
-
 	m, err := usr.users.CreateUser(user.Name, user.Sale)
 	if err != nil {
-		log.Printf("Got error in mysql connector: %s", err)
-
+		log.Printf("При выполнении функции создания возникла ошибка: %s", err)
 		return
 	}
 	json.NewEncoder(res).Encode(&m)
 }
+
+//метод контроллера по изменению информации у конкретного id
 func (usr *UserCtrl) UpdateUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
 	var user model.User
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Ошибка маршаллинга данных для изменения")
 		return
 	}
 	fmt.Println(user)
@@ -106,18 +97,16 @@ func (usr *UserCtrl) UpdateUser(res http.ResponseWriter, req *http.Request) {
 	}
 
 	json.NewEncoder(res).Encode(&users)
-
 }
-func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
 
+//метод контроллера по удалению из БД по id
+func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
-	//var user model.User
 	params := mux.Vars(req)
 	id := params["id"]
 	s, err := strconv.Atoi(id)
 	if err != nil {
-		log.Printf("Got error in mysql connector: %s", err)
-
+		log.Printf("Неудачно выполнен перевод id bp string в int %s", err)
 	}
 	p, err := usr.users.DeleteUser(s)
 	if err != nil {
