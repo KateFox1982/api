@@ -22,12 +22,11 @@ type UserModel struct {
 //		name,
 //		sale,
 //	}
-
+//метод модели по получению всех пользователей из БД
 func (m *UserModel) Getusers() ([]User, error) {
-	//goland:noinspection ALL
-	var rows, err = m.DB.Query("SELECT * FROM Misha2")
+	var rows, err = m.DB.Query("SELECT id, name, sale FROM Misha2")
 	if err != nil {
-		log.Fatal("Ошибка в модели ")
+		log.Fatal("Ошибка в выбора таблицы ")
 		return nil, err
 	}
 	defer rows.Close()
@@ -36,45 +35,42 @@ func (m *UserModel) Getusers() ([]User, error) {
 		p := User{}
 		err := rows.Scan(&p.ID, &p.Name, &p.Sale)
 		if err != nil {
-			log.Fatal("Ошибка в модели ")
+			log.Fatal("Ошибка сканирования результата селекта ")
 			return nil, err
 		}
 		users = append(users, p)
 	}
 	return users, err
 }
+
+//метод модели по получению всех пользователей из БД по id
 func (m *UserModel) GetSingleUser(id int) (User, error) {
 	var p User
-
-	//goland:noinspection SqlResolve
 	row1 := m.DB.QueryRow("SELECT id, name, sale FROM Misha2 where id=$1", id)
-
 	err := row1.Scan(&p.ID, &p.Name, &p.Sale)
 	if err == sql.ErrNoRows {
 		err = fmt.Errorf("Нет такого id=%d", id)
 		return p, err
-		//	//else if err != nil {
-		//	//	fmt.Println("Unexpected error: ", err.Error())
 	}
 
 	return p, err
 }
+
+//метод модели по созданию нового пользователя используя уникальный id
 func (m *UserModel) CreateUser(name string, sale int) (User, error) {
 
 	var user = User{Name: name, Sale: sale}
 
-	//var lastInsertID int
-
 	err := m.DB.QueryRow("INSERT INTO Misha2 (name, sale) VALUES($1,$2) returning id", user.Name, user.Sale).Scan(&user.ID)
 	if err != nil {
-
-		fmt.Println(err)
+		log.Fatal("Ошибка создания строки")
 		return user, err
 	}
 	return user, nil
 }
+
+//метод модели по изменению конкретного пользователя из БД
 func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
-	//
 	user := User{ID: id, Name: name, Sale: sale}
 	fmt.Println("Печать из модели", id, name, sale)
 	_, err := m.DB.Exec("update Misha2 set name =$1, sale= $2 where id = $3", user.Name, user.Sale, user.ID)
@@ -84,25 +80,22 @@ func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
 
 	return user, err
 }
+
+////метод модели по удалению конкретного пользователя из БД по id
 func (m *UserModel) DeleteUser(id int) (User, error) {
-
 	var s *string
-
 	row1 := m.DB.QueryRow("SELECT FROM Misha2 where id=$1", id)
-	//p := new(ID)
-
 	err := row1.Scan(&s)
-
 	if err == sql.ErrNoRows {
 		err = fmt.Errorf("Нет такого id=%d", id)
 		return User{}, err
 	} else {
 		var k string
 		row := m.DB.QueryRow("DELETE  FROM Misha2 where id=$1", id)
-
 		err = row.Scan(&k)
 		if err == sql.ErrNoRows {
-			fmt.Println()
+			log.Fatal("Ошибка удаления строки из БД")
+
 		}
 	}
 	return User{}, err
