@@ -8,21 +8,21 @@ import (
 	"net/http"
 )
 
-type UserDB struct {
-	users controller.UserCtrl
-}
-
 func main() {
+	//пароль, имя БД
 	DataSourceName := "user=fox password=123 dbname=fix sslmode=disable"
+	//соединение с БД
 	DB, err := sql.Open("postgres", DataSourceName)
-
+	//ошибка соединения
 	if err != nil {
 		log.Printf("Got error in mysql connector: %s", err)
 		return
 	}
+	//отсрочка закрытия БД
 	defer DB.Close()
-
+	//прослушивание браузера, обращение к методам контроллера
 	router := mux.NewRouter()
+
 	router.HandleFunc("/users", func(res http.ResponseWriter, req *http.Request) {
 		//userCtrl := controller.NewUserCtrl()
 		userCtrl := controller.NewUserCtrl(DB)
