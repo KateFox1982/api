@@ -20,8 +20,9 @@ type UserCtrl struct {
 //конструктор контроллера
 func NewUserCtrl(DB *sql.DB) *UserCtrl {
 	return &UserCtrl{
-		users: &model.UserModel{
-			DB: DB},
+		users: model.NewUserModel(DB),
+		//users: &model.UserModel{
+		//	DB: DB},
 	}
 }
 
