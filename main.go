@@ -16,7 +16,7 @@ func main() {
 	DB, err := sql.Open("postgres", DataSourceName)
 	//err ошибка соединения
 	if err != nil {
-		log.Printf("Получить ошибку о mysql присоединении: %s", err)
+		log.Printf("Получить ошибку о postgres присоединении: %s", err)
 		return
 	}
 	//defer Close отсрочка закрытия БД
