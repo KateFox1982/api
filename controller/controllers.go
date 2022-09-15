@@ -24,8 +24,6 @@ type UserCtrl struct {
 func NewUserCtrl(DB *sql.DB) *UserCtrl {
 	return &UserCtrl{
 		users: model.NewUserModel(DB),
-		//users: &model.UserModel{
-		//	DB: DB},
 	}
 }
 
@@ -37,6 +35,8 @@ func (usr *UserCtrl) Getusers(res http.ResponseWriter, req *http.Request) {
 	users, err := usr.users.Getusers()
 	if err != nil {
 		log.Printf("Ошибка выполнеия функции получения информации о всех пользователях: %s", err)
+		fmt.Fprintf(res, "Ошибка выполнеия функции получения информации о всех пользователях: %s", err)
+
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main
@@ -55,14 +55,14 @@ func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 	s, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println("Ошибка перевода id из string в int ", err)
-		log.Printf("Ошибка перевода id из string в int %s", err)
+		fmt.Fprintf(res, "Ошибка перевода id из string в int ", err)
 		return
 	}
 	//передача парметра id методу модели GetSingleUser
 	p, err := usr.users.GetSingleUser(s)
 	if err != nil {
 		fmt.Println("Ошибка выполнения функции выбора по id: ", err)
-		log.Printf("Ошибка выполнения функции выбора по id: %s", err)
+		fmt.Fprintf(res, "Ошибка выполнения функции выбора по id: ", err)
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main
@@ -79,15 +79,15 @@ func (usr *UserCtrl) CreateUser(res http.ResponseWriter, req *http.Request) {
 	//декорирование тела запроса в структуру
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-		fmt.Println("Ошибка чтения информации для сздания новой записи : ", err)
-		log.Printf("Ошибка чтения информации для сздания новой записи : %s", err)
+		fmt.Println("Ошибка чтения информации для создания новой записи : ", err)
+		fmt.Fprintf(res, "Ошибка чтения информации для создания новой записи : ", err)
 		return
 	}
 	//передача парметров запроса методу модели CreateUser
 	m, err := usr.users.CreateUser(user.Name, user.Sale)
 	if err != nil {
 		fmt.Println("При выполнении функции создания возникла ошибка: ", err)
-		log.Printf("При выполнении функции создания возникла ошибка: %s", err)
+		fmt.Fprintf(res, "При выполнении функции создания возникла ошибка: ", err)
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main
@@ -104,14 +104,14 @@ func (usr *UserCtrl) UpdateUser(res http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
 		fmt.Println("Ошибка маршаллинга данных для изменения", err)
-		log.Fatal("Ошибка маршаллинга данных для изменения:", err)
+		fmt.Fprintf(res, "Ошибка маршаллинга данных для изменения", err)
 		return
 	}
 	//передача парметров запроса методу модели UpdateUser
 	users, err := usr.users.UpdateUser(user.ID, user.Name, user.Sale)
 	if err != nil {
 		fmt.Println("При изменении что то пошло не так:", err)
-		log.Printf("При изменении что то пошло не так: %s", err)
+		fmt.Fprintf(res, "При изменении что то пошло не так:", err)
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main
@@ -129,14 +129,14 @@ func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
 	s, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println("Неудачно выполнен перевод id bp string в int ", err)
-		log.Printf("Неудачно выполнен перевод id bp string в int %s", err)
+		fmt.Fprintf(res, "Неудачно выполнен перевод id bp string в int ", err)
 		return
 	}
 	//передача парметра id методу модели GetSingleUser
 	p, err := usr.users.DeleteUser(s)
 	if err != nil {
-		log.Printf("Не удалилось %s", id)
 		fmt.Println("Не удачно удалилось ", err)
+		fmt.Fprintf(res, "Не удачно удалилось ", err)
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main
