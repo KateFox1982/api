@@ -1,8 +1,10 @@
+// Package controller, передача методов в Package model, согласно MVC
 package controller
 
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"log"
@@ -12,12 +14,12 @@ import (
 	"net/http"
 )
 
-// структура UserCtrl
+// UserCtrl структура используется для конструктора контроллер
 type UserCtrl struct {
 	users *model.UserModel
 }
 
-//конструктор контроллера, возращающий экземпляр структуры UserCtrl
+// NewUserCtrl конструктор контроллера, возращающий экземпляр структуры UserCtrl
 // со свойством users контроллера модели с аргументом DB
 func NewUserCtrl(DB *sql.DB) *UserCtrl {
 	return &UserCtrl{
@@ -27,9 +29,9 @@ func NewUserCtrl(DB *sql.DB) *UserCtrl {
 	}
 }
 
-//метод контроллера по получения всех значений из БД
+// Getusers метод контроллера по получения всех значений из БД
 func (usr *UserCtrl) Getusers(res http.ResponseWriter, req *http.Request) {
-	//прием заголовка URL, парсинг в json
+	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
 	res.Header().Set("Content-Type", "application/json")
 	//обращение к методу модели Getusers
 	users, err := usr.users.Getusers()
@@ -41,9 +43,9 @@ func (usr *UserCtrl) Getusers(res http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(res).Encode(&users)
 }
 
-//метод контроллера по получению значения по id
+// GetSingleUser метод контроллера по получению значения по id
 func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
-	//прием заголовка URL, парсинг в json
+	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
 	res.Header().Set("Content-Type", "application/json")
 	//изъятия из заголовка URL id string
 	params := mux.Vars(req) // we are extracting 'id' of the Course which we are passing in the url
@@ -52,12 +54,14 @@ func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 	//конвертация string в int
 	s, err := strconv.Atoi(id)
 	if err != nil {
+		fmt.Println("Ошибка перевода id из string в int ", err)
 		log.Printf("Ошибка перевода id из string в int %s", err)
 		return
 	}
 	//передача парметра id методу модели GetSingleUser
 	p, err := usr.users.GetSingleUser(s)
 	if err != nil {
+		fmt.Println("Ошибка выполнения функции выбора по id: ", err)
 		log.Printf("Ошибка выполнения функции выбора по id: %s", err)
 		return
 	}
@@ -66,22 +70,23 @@ func (usr *UserCtrl) GetSingleUser(res http.ResponseWriter, req *http.Request) {
 
 }
 
-//метод контроллера по созданию нового элемента в БД
+// CreateUser метод контроллера по созданию нового элемента в БД
 func (usr *UserCtrl) CreateUser(res http.ResponseWriter, req *http.Request) {
-	//прием заголовка URL, парсинг в json
+	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
 	res.Header().Set("Content-Type", "application/json")
 	//объявление структуры User пакета model
 	var user model.User
 	//декорирование тела запроса в структуру
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-
+		fmt.Println("Ошибка чтения информации для сздания новой записи : ", err)
 		log.Printf("Ошибка чтения информации для сздания новой записи : %s", err)
 		return
 	}
 	//передача парметров запроса методу модели CreateUser
 	m, err := usr.users.CreateUser(user.Name, user.Sale)
 	if err != nil {
+		fmt.Println("При выполнении функции создания возникла ошибка: ", err)
 		log.Printf("При выполнении функции создания возникла ошибка: %s", err)
 		return
 	}
@@ -89,21 +94,23 @@ func (usr *UserCtrl) CreateUser(res http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(res).Encode(&m)
 }
 
-//метод контроллера по изменению информации у конкретного id
+// UpdateUser метод контроллера по изменению информации у конкретного id
 func (usr *UserCtrl) UpdateUser(res http.ResponseWriter, req *http.Request) {
-	//прием заголовка URL, парсинг в json
+	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
 	res.Header().Set("Content-Type", "application/json")
 	//объявление структуры User пакета model
 	var user model.User
 	//декорирование тела запроса в структуру
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
-		log.Fatal("Ошибка маршаллинга данных для изменения")
+		fmt.Println("Ошибка маршаллинга данных для изменения", err)
+		log.Fatal("Ошибка маршаллинга данных для изменения:", err)
 		return
 	}
 	//передача парметров запроса методу модели UpdateUser
 	users, err := usr.users.UpdateUser(user.ID, user.Name, user.Sale)
 	if err != nil {
+		fmt.Println("При изменении что то пошло не так:", err)
 		log.Printf("При изменении что то пошло не так: %s", err)
 		return
 	}
@@ -111,9 +118,9 @@ func (usr *UserCtrl) UpdateUser(res http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(res).Encode(&users)
 }
 
-//метод контроллера по удалению из БД по id
+// DeleteUser метод контроллера по удалению из БД по id
 func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
-	//прием заголовка URL, парсинг в json
+	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
 	res.Header().Set("Content-Type", "application/json")
 	//изъятия из заголовка URL id string
 	params := mux.Vars(req)
@@ -121,12 +128,15 @@ func (usr *UserCtrl) DeleteUser(res http.ResponseWriter, req *http.Request) {
 	//конвертация string в int
 	s, err := strconv.Atoi(id)
 	if err != nil {
+		fmt.Println("Неудачно выполнен перевод id bp string в int ", err)
 		log.Printf("Неудачно выполнен перевод id bp string в int %s", err)
+		return
 	}
 	//передача парметра id методу модели GetSingleUser
 	p, err := usr.users.DeleteUser(s)
 	if err != nil {
-		log.Printf("Все удачно удалилось %s", id)
+		log.Printf("Не удалилось %s", id)
+		fmt.Println("Не удачно удалилось ", err)
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main
