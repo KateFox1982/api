@@ -4,7 +4,6 @@ package model
 import (
 	"database/sql"
 	"fmt"
-	"log"
 )
 
 // User структура используется инициализации данные в структуры
@@ -31,9 +30,7 @@ func (m *UserModel) Getusers() ([]User, error) {
 	//rows запрос возврата сроки выборки из таблицы значений
 	var rows, err = m.DB.Query("SELECT id, name, sale FROM Misha2")
 	if err != nil {
-		log.Fatal("Ошибка в выбора таблицы ", err)
 		fmt.Println("Ошибка в выбора таблицы ", err)
-
 		return nil, err
 	}
 	defer rows.Close()
@@ -44,7 +41,6 @@ func (m *UserModel) Getusers() ([]User, error) {
 		p := User{}
 		err := rows.Scan(&p.ID, &p.Name, &p.Sale)
 		if err != nil {
-			log.Fatal("Ошибка сканирования результата селекта ", err)
 			fmt.Println("Ошибка сканирования результата селекта ", err)
 			return nil, err
 		}
@@ -78,7 +74,6 @@ func (m *UserModel) CreateUser(name string, sale int) (User, error) {
 	err := m.DB.QueryRow("INSERT INTO Misha2 (name, sale) VALUES($1,$2) returning id", user.Name, user.Sale).Scan(&user.ID)
 	if err != nil {
 		fmt.Println("Ошибка создания строки ", err)
-		log.Fatal("Ошибка создания строки ", err)
 		return user, err
 	}
 	return user, nil
@@ -90,12 +85,18 @@ func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
 	user := User{ID: id, Name: name, Sale: sale}
 	fmt.Println("Печать из модели", id, name, sale)
 	//изменения в БД значений при совпадении id
-	_, err := m.DB.Exec("update Misha2 set name =$1, sale= $2 where id = $3", user.Name, user.Sale, user.ID)
-	if err != nil {
-		err = fmt.Errorf("Нет такого id=%d", user.ID)
+	row1 := m.DB.QueryRow("SELECT id FROM Misha2 where id=$1", user.ID)
+	err := row1.Scan(&user.ID)
+	if err == sql.ErrNoRows {
+		err = fmt.Errorf("Нет такого id=%d", id)
+		return user, err
+	} else {
+		_, err := m.DB.Exec("update Misha2 set name =$1, sale= $2 where id = $3", user.Name, user.Sale, user.ID)
+		if err != nil {
+			err = fmt.Errorf("Нет такого id=%d", user.ID)
+		}
+		return user, err
 	}
-
-	return user, err
 }
 
 // DeleteUser метод модели по удалению конкретного пользователя из БД по id, возвращает структуру User и ошибку
@@ -114,7 +115,6 @@ func (m *UserModel) DeleteUser(id int) (User, error) {
 		err = row.Scan(&k)
 		if err == sql.ErrNoRows {
 			fmt.Errorf("Ошибка удаления строки из БД", err)
-			log.Fatal("Ошибка удаления строки из БД")
 			return User{}, err
 		}
 	}
