@@ -1,3 +1,4 @@
+// Package model, извлечение из БД, выполнение манипуляций с БД
 package model
 
 import (
@@ -6,41 +7,45 @@ import (
 	"log"
 )
 
-// структура User
+// User структура используется инициализации данные в структуры
 type User struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 	Sale int    `json:"sale"`
 }
+
+// UserModel используется для конструктора модели
 type UserModel struct {
 	DB *sql.DB
 }
 
-// конструктор модели возвращающий указатель на структуру UserModel
-
+// NewUserModel конструктор модели возвращающий указатель на структуру UserModel
 func NewUserModel(DB *sql.DB) *UserModel {
 	return &UserModel{
 		DB: DB,
 	}
 }
 
-//метод модели по получению всех пользователей из БД
+// Getusers метод модели по получению всех пользователей из БД возвращает массив структур User и ошибку
 func (m *UserModel) Getusers() ([]User, error) {
-	//запрос возврата сроки выборки из таблицы значений
+	//rows запрос возврата сроки выборки из таблицы значений
 	var rows, err = m.DB.Query("SELECT id, name, sale FROM Misha2")
 	if err != nil {
-		log.Fatal("Ошибка в выбора таблицы ")
+		log.Fatal("Ошибка в выбора таблицы ", err)
+		fmt.Println("Ошибка в выбора таблицы ", err)
+
 		return nil, err
 	}
 	defer rows.Close()
-	//инициализация массива структур User
+	//users инициализация массива структур User
 	users := []User{}
 	//получение данных из всей таблицы
 	for rows.Next() {
 		p := User{}
 		err := rows.Scan(&p.ID, &p.Name, &p.Sale)
 		if err != nil {
-			log.Fatal("Ошибка сканирования результата селекта ")
+			log.Fatal("Ошибка сканирования результата селекта ", err)
+			fmt.Println("Ошибка сканирования результата селекта ", err)
 			return nil, err
 		}
 		//добавление новых данных в массив структур
@@ -50,12 +55,12 @@ func (m *UserModel) Getusers() ([]User, error) {
 	return users, err
 }
 
-//метод модели по получению всех пользователей из БД по id
+// GetSingleUser метод модели по получению всех пользователей из БД по id, возвращает структуру User и ошибку
 func (m *UserModel) GetSingleUser(id int) (User, error) {
 	var p User
-	//запрос возврата сроки выборки из таблицы значений значений по id
+	//QueryRow запрос возврата сроки выборки из таблицы значений значений по id
 	row1 := m.DB.QueryRow("SELECT id, name, sale FROM Misha2 where id=$1", id)
-	// сканирование полученных результатов
+	//row1.Scan сканирование полученных результатов
 	err := row1.Scan(&p.ID, &p.Name, &p.Sale)
 	if err == sql.ErrNoRows {
 		err = fmt.Errorf("Нет такого id=%d", id)
@@ -65,20 +70,21 @@ func (m *UserModel) GetSingleUser(id int) (User, error) {
 	return p, err
 }
 
-//метод модели по созданию нового пользователя используя уникальный id
+// CreateUser метод модели по созданию нового пользователя используя уникальный id возвращает структу User и ошибку
 func (m *UserModel) CreateUser(name string, sale int) (User, error) {
-	//инициализация данных переданных из контроллера в структуру User
+	//user инициализация данных переданных из контроллера в структуру User
 	var user = User{Name: name, Sale: sale}
 	//создание нового значения используя данные переданных из контроллера с уникальным id
 	err := m.DB.QueryRow("INSERT INTO Misha2 (name, sale) VALUES($1,$2) returning id", user.Name, user.Sale).Scan(&user.ID)
 	if err != nil {
-		log.Fatal("Ошибка создания строки")
+		fmt.Println("Ошибка создания строки ", err)
+		log.Fatal("Ошибка создания строки ", err)
 		return user, err
 	}
 	return user, nil
 }
 
-//метод модели по изменению конкретного пользователя из БД
+// UpdateUser метод модели по изменению конкретного пользователя из БД, возвращает структуру User и ошибку
 func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
 	//инициализация данных переданных из контроллера в структуру User
 	user := User{ID: id, Name: name, Sale: sale}
@@ -92,10 +98,10 @@ func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
 	return user, err
 }
 
-////метод модели по удалению конкретного пользователя из БД по id
+// DeleteUser метод модели по удалению конкретного пользователя из БД по id, возвращает структуру User и ошибку
 func (m *UserModel) DeleteUser(id int) (User, error) {
 	var s *string
-	//нахождение строки с id переданного из контроллера
+	//row1 нахождение строки с id переданного из контроллера
 	row1 := m.DB.QueryRow("SELECT FROM Misha2 where id=$1", id)
 	err := row1.Scan(&s)
 	if err == sql.ErrNoRows {
@@ -107,8 +113,9 @@ func (m *UserModel) DeleteUser(id int) (User, error) {
 		row := m.DB.QueryRow("DELETE  FROM Misha2 where id=$1", id)
 		err = row.Scan(&k)
 		if err == sql.ErrNoRows {
+			fmt.Errorf("Ошибка удаления строки из БД", err)
 			log.Fatal("Ошибка удаления строки из БД")
-
+			return User{}, err
 		}
 	}
 	return User{}, err
