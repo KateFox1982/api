@@ -16,19 +16,19 @@ type ErrorModel struct {
 	DB *sql.DB
 }
 
-// NewUserModel конструктор модели возвращающий указатель на структуру UserModel
-func NewErrorModel(DB *sql.DB) *ModuleModel {
-	return &ModuleModel{
+// NewUserModel конструктор модели возвращающий указатель на структуру ErrorModel
+func NewErrorModel(DB *sql.DB) *ErrorModel {
+	return &ErrorModel{
 		DB: DB,
 	}
 }
 
 // GetErrorById метод модели по получению всех пользователей из БД возвращает массив структур Error и ошибку
-func (m *ModuleModel) GetErrorById(moduleId int64) ([]Error, error) {
+func (m *ErrorModel) GetErrorById(moduleId int64) ([]Error, error) {
 	//Query запрос возврата срок выборки из таблицы значений значений по id
 	var rows, err = m.DB.Query("SELECT id, title FROM documentations.error where fk_module=$1", moduleId)
 	if err != nil {
-		fmt.Println("Ошибка в выбора таблицы ", err)
+		err := fmt.Errorf("Ошибка в выбора таблицы %s ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -38,7 +38,7 @@ func (m *ModuleModel) GetErrorById(moduleId int64) ([]Error, error) {
 		p := Error{}
 		err := rows.Scan(&p.Id, &p.Title)
 		if err != nil {
-			fmt.Println("Ошибка сканирования результата селекта ", err)
+			err := fmt.Errorf("Ошибка сканирования результата селекта %s ", err)
 			return nil, err
 		}
 		//добавление новых данных в массив структур

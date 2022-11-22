@@ -25,12 +25,13 @@ func NewUserModel(DB *sql.DB) *UserModel {
 	}
 }
 
-// Getusers метод модели по получению всех пользователей из БД возвращает массив структур User и ошибку
+// Getusers метод модели по получению всех пользователей из БД возвращает массив
+//структур User и ошибку
 func (m *UserModel) Getusers() ([]User, error) {
 	//rows запрос возврата сроки выборки из таблицы значений
 	var rows, err = m.DB.Query("SELECT id, name, sale FROM Misha2")
 	if err != nil {
-		fmt.Println("Ошибка в выбора таблицы ", err)
+		err = fmt.Errorf("Ошибка в выбора таблицы %s", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -41,7 +42,7 @@ func (m *UserModel) Getusers() ([]User, error) {
 		p := User{}
 		err := rows.Scan(&p.ID, &p.Name, &p.Sale)
 		if err != nil {
-			fmt.Println("Ошибка сканирования результата селекта ", err)
+			err = fmt.Errorf("Ошибка сканирования результата селекта %s", err)
 			return nil, err
 		}
 		//добавление новых данных в массив структур
@@ -73,7 +74,7 @@ func (m *UserModel) CreateUser(name string, sale int) (User, error) {
 	//создание нового значения используя данные переданных из контроллера с уникальным id
 	err := m.DB.QueryRow("INSERT INTO Misha2 (name, sale) VALUES($1,$2) returning id", user.Name, user.Sale).Scan(&user.ID)
 	if err != nil {
-		fmt.Println("Ошибка создания строки ", err)
+		err = fmt.Errorf("Ошибка создания строки %s", err)
 		return user, err
 	}
 	return user, nil
@@ -114,7 +115,7 @@ func (m *UserModel) DeleteUser(id int) (User, error) {
 		row := m.DB.QueryRow("DELETE  FROM Misha2 where id=$1", id)
 		err = row.Scan(&k)
 		if err == sql.ErrNoRows {
-			fmt.Errorf("Ошибка удаления строки из БД", err)
+			err = fmt.Errorf("Ошибка удаления строки из БД %s", err)
 			return User{}, err
 		}
 	}

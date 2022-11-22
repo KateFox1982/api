@@ -13,7 +13,7 @@ import (
 
 // ErrorController структура используется для конструктора контроллер
 type ErrorController struct {
-	model *model.ModuleModel
+	model *model.ErrorModel
 }
 
 // NewErrorModel конструктор контроллера, возращающий экземпляр структуры ErrorController
@@ -40,7 +40,7 @@ func (dc *ErrorController) GetErrorById(res http.ResponseWriter, req *http.Reque
 		fmt.Fprintf(res, m, err)
 		return
 	}
-	//передача парметра id методу модели GetSingleUser
+	//передача парметра id методу модели GetErrorById
 	p, err := dc.model.GetErrorById(s)
 	if err != nil {
 		m := "Ошибка выполнения функции выбора по id: "

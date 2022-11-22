@@ -16,7 +16,7 @@ type ModuleModel struct {
 	DB *sql.DB
 }
 
-// NewModuleModel конструктор модели возвращающий указатель на структуру UserModel
+// NewModuleModel конструктор модели возвращающий указатель на структуру ModuleModel
 func NewModuleModel(DB *sql.DB) *ModuleModel {
 	return &ModuleModel{
 		DB: DB,
@@ -28,7 +28,7 @@ func (m *ModuleModel) GetModuleById(documentId int64) ([]Module, error) {
 	//QueryRow запрос возврата сроки выборки из таблицы значений значений по id
 	var rows, err = m.DB.Query("SELECT id, title FROM documentations.module where fk_document=$1", documentId)
 	if err != nil {
-		fmt.Println("Ошибка в выбора таблицы ", err)
+		err = fmt.Errorf("Ошибка в выбора таблицы %s", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -38,7 +38,7 @@ func (m *ModuleModel) GetModuleById(documentId int64) ([]Module, error) {
 		p := Module{}
 		err := rows.Scan(&p.Id, &p.Title)
 		if err != nil {
-			fmt.Println("Ошибка сканирования результата селекта ", err)
+			err = fmt.Errorf("Ошибка сканирования результата селекта %s", err)
 			return nil, err
 		}
 		//добавление новых данных в массив структур

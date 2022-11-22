@@ -19,7 +19,7 @@ type UserController struct {
 }
 
 // NewUserCtrl конструктор контроллера, возращающий экземпляр структуры UserCtrl
-// со свойством users контроллера модели с аргументом DB
+// со свойством model контроллера модели с аргументом DB
 func NewUserController(DB *sql.DB) *UserController {
 	return &UserController{
 		model: model.NewUserModel(DB),

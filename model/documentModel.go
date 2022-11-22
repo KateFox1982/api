@@ -16,7 +16,7 @@ type DocumentModel struct {
 	DB *sql.DB
 }
 
-// NewUserModel конструктор модели возвращающий указатель на структуру UserModel
+// NewUserModel конструктор модели возвращающий указатель на структуру DocumentModel
 func NewDocumentModel(DB *sql.DB) *DocumentModel {
 	return &DocumentModel{
 		DB: DB,
@@ -28,7 +28,7 @@ func (m *DocumentModel) GetDocuments() ([]Document, error) {
 	//rows запрос возврата срок выборки из таблицы значений
 	var rows, err = m.DB.Query("SELECT id, title FROM documentations.document")
 	if err != nil {
-		fmt.Println("Ошибка в выбора таблицы ", err)
+		err := fmt.Errorf("Ошибка в выбора таблицы %s ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -39,7 +39,7 @@ func (m *DocumentModel) GetDocuments() ([]Document, error) {
 		p := Document{}
 		err := rows.Scan(&p.Id, &p.Title)
 		if err != nil {
-			fmt.Println("Ошибка сканирования результата селекта ", err)
+			err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
 			return nil, err
 		}
 		//добавление новых данных в массив структур

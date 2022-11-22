@@ -15,7 +15,7 @@ type DocumentController struct {
 }
 
 // NewDocumentModel конструктор контроллера, возращающий экземпляр структуры DocumentController
-// со свойством users контроллера модели с аргументом DB
+// со свойством model контроллера модели с аргументом DB
 func NewDocumentModel(DB *sql.DB) *DocumentController {
 	return &DocumentController{
 		model: model.NewDocumentModel(DB),
