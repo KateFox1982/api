@@ -25,7 +25,6 @@ func NewModuleModel(DB *sql.DB) *ModuleModel {
 
 // GetModuleById метод модели по получению всех пользователей из БД возвращает массив структур Module по id документа и ошибку
 func (m *ModuleModel) GetModuleById(documentId int64) ([]Module, error) {
-
 	//QueryRow запрос возврата сроки выборки из таблицы значений значений по id
 	var rows, err = m.DB.Query("SELECT id, title FROM documentations.module where fk_document=$1", documentId)
 	if err != nil {

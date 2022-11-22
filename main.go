@@ -44,7 +44,7 @@ func main() {
 		userCtrl := controller.NewUserController(DB)
 		userCtrl.DeleteUser(res, req)
 	}).Methods("DELETE")
-	//router.HandleFunc регистрация третьего маршрута, с URL оканчивающимся на "/user ,
+	//router.HandleFunc регистрация третьего маршрута, с URL оканчивающимся на "/user,
 	//и методом PUT, созадет новый экземпляр конструктора
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера UpdateUser
 	router.HandleFunc("/user", func(res http.ResponseWriter, req *http.Request) {
