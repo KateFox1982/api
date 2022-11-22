@@ -30,7 +30,6 @@ func (dc *ModuleController) GetModuleById(res http.ResponseWriter, req *http.Req
 	res.Header().Set("Content-Type", "application/json")
 	//изъятия из заголовка URL id string
 	params := mux.Vars(req) // we are extracting 'id' of the Course which we are passing in the url
-
 	var id = params["id"]
 	//конвертация string в int
 	//парсинг id из строки в int 64

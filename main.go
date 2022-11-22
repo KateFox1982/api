@@ -30,7 +30,7 @@ func main() {
 		userCtrl := controller.NewUserController(DB)
 		userCtrl.Getusers(res, req)
 	}).Methods("GET")
-	//router.HandleFunc регистрация второго маршрута, с URL оканчивающимся на "/user и параметром id, который пользователь указывает в URL,
+	//router.HandleFunc регистрация второго маршрута,с URL оканчивающимся на "/user и параметром id, который пользователь указывает в URL,
 	//и методом GET, созадет новый экземпляр конструктора
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера GetSingleUser
 	router.HandleFunc("/user/{id}", func(res http.ResponseWriter, req *http.Request) {

@@ -33,7 +33,6 @@ func (dc *ErrorController) GetErrorById(res http.ResponseWriter, req *http.Reque
 
 	var id = params["id"]
 	//конвертация string в int
-
 	s, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		m := "Ошибка перевода id из string в int64 "
