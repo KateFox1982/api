@@ -58,12 +58,10 @@ func (m *DocumentModel) GetDocuments() ([]Document, error) {
 
 // GetDocumentsFull получение вложенных типов Module и Error в Documents
 func (m *DocumentModel) GetDocumentsFull() ([]Document, error) {
-	//инициализация переменной doc являющейся экземпляром структруры Document
-	var doc = []Document{}
 	//вызов метода GetDocuments для получения всех документов
 	doc, err := m.GetDocuments()
 	if err != nil {
-		err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
+		err := fmt.Errorf("ошибка функции GetDocuments %s", err)
 		return []Document{}, err
 	}
 	//Цикл range для передобра значений структуры Document
