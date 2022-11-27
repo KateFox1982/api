@@ -7,26 +7,28 @@ import (
 
 // Module структура используется инициализации данные в структуры
 type Module struct {
-	Id    int64  `json:"id"`
-	Title string `json:"title"`
+	Id     int64   `json:"id"`
+	Title  string  `json:"title"`
+	Errors []Error `json:"errors"`
 }
 
 // ModuleModel используется для конструктора модели
 type ModuleModel struct {
-	DB *sql.DB
+	dataBase *sql.DB
 }
 
 // NewModuleModel конструктор модели возвращающий указатель на структуру ModuleModel
 func NewModuleModel(DB *sql.DB) *ModuleModel {
 	return &ModuleModel{
-		DB: DB,
+		dataBase: DB,
 	}
 }
 
 // GetModuleById метод модели по получению всех пользователей из БД возвращает массив структур Module по id документа и ошибку
 func (m *ModuleModel) GetModuleById(documentId int64) ([]Module, error) {
+	fmt.Println("m.dataBase", m.dataBase)
 	//QueryRow запрос возврата сроки выборки из таблицы значений значений по id
-	var rows, err = m.DB.Query("SELECT id, title FROM documentations.module where fk_document=$1", documentId)
+	var rows, err = m.dataBase.Query("SELECT id, title FROM documentations.module where fk_document=$1", documentId)
 	if err != nil {
 		err = fmt.Errorf("Ошибка в выбора таблицы %s", err)
 		return nil, err

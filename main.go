@@ -3,7 +3,9 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"log"
 	"my_project/controller"
 	"net/http"
@@ -23,6 +25,7 @@ func main() {
 	defer DB.Close()
 	//запуск роутера
 	router := mux.NewRouter()
+	fmt.Println("Сервер запустился")
 	//router.HandleFunc регистрация первого маршрута, с URL оканчивающимся на "/users" и методом GET, созадет новый экземпляр конструктора
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера Getusers
 	router.HandleFunc("/users", func(res http.ResponseWriter, req *http.Request) {
@@ -62,23 +65,30 @@ func main() {
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера Getusers
 	router.HandleFunc("/documents", func(res http.ResponseWriter, req *http.Request) {
 		//userCtrl := controller.NewUserCtrl()
-		userCtrl := controller.NewDocumentModel(DB)
+		userCtrl := controller.NewDocumentController(DB)
 		userCtrl.GetDocuments(res, req)
 	}).Methods("GET")
 	//router.HandleFunc регистрация второго маршрута, с URL оканчивающимся на "/module и параметром id, который пользователь указывает в URL,
 	//и методом GET, созадет новый экземпляр конструктора
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера GetModuleById
 	router.HandleFunc("/module/{id}", func(res http.ResponseWriter, req *http.Request) {
-		userCtrl := controller.NewModuleModel(DB)
+		userCtrl := controller.NewModuleModelController(DB)
 		userCtrl.GetModuleById(res, req)
 	}).Methods("GET")
 	//router.HandleFunc регистрация второго маршрута, с URL оканчивающимся на "/error и параметром id, который пользователь указывает в URL,
 	//и методом GET, созадет новый экземпляр конструктора
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера GetErrorById
 	router.HandleFunc("/error/{id}", func(res http.ResponseWriter, req *http.Request) {
-		userCtrl := controller.NewErrorModel(DB)
+		userCtrl := controller.NewErrorController(DB)
 		userCtrl.GetErrorById(res, req)
 	}).Methods("GET")
+	//router.HandleFunc регистрация второго маршрута, с URL оканчивающимся на "/full, который пользователь указывает в URL,
+	//и методом GET, созадет новый экземпляр конструктора
+	//контроллера с аргументом DB, прием-передача параметров функции контроллера GetDocumentsFull
+	router.HandleFunc("/full", func(res http.ResponseWriter, req *http.Request) {
+		userCtrl := controller.NewDocumentController(DB)
+		userCtrl.GetDocumentsFull(res, req)
+	}).Methods("GET")
 	//ListenAndServe запуск http -сервером с адресом 127.0.0.1:4000, и обработчиком router
-	log.Fatal(http.ListenAndServe("127.0.0.1:4000", router))
+	log.Fatal(http.ListenAndServe("127.0.0.1:5000", router))
 }

@@ -15,13 +15,13 @@ type User struct {
 
 // UserModel используется для конструктора модели
 type UserModel struct {
-	DB *sql.DB
+	dataBase *sql.DB
 }
 
 // NewUserModel конструктор модели возвращающий указатель на структуру UserModel
 func NewUserModel(DB *sql.DB) *UserModel {
 	return &UserModel{
-		DB: DB,
+		dataBase: DB,
 	}
 }
 
@@ -29,7 +29,7 @@ func NewUserModel(DB *sql.DB) *UserModel {
 //структур User и ошибку
 func (m *UserModel) Getusers() ([]User, error) {
 	//rows запрос возврата сроки выборки из таблицы значений
-	var rows, err = m.DB.Query("SELECT id, name, sale FROM Misha2")
+	var rows, err = m.dataBase.Query("SELECT id, name, sale FROM Misha2")
 	if err != nil {
 		err = fmt.Errorf("Ошибка в выбора таблицы %s", err)
 		return nil, err
@@ -56,7 +56,7 @@ func (m *UserModel) Getusers() ([]User, error) {
 func (m *UserModel) GetSingleUser(id int) (User, error) {
 	var p User
 	//QueryRow запрос возврата сроки выборки из таблицы значений значений по id
-	row1 := m.DB.QueryRow("SELECT id, name, sale FROM Misha2 where id=$1", id)
+	row1 := m.dataBase.QueryRow("SELECT id, name, sale FROM Misha2 where id=$1", id)
 	//row1.Scan сканирование полученных результатов
 	err := row1.Scan(&p.ID, &p.Name, &p.Sale)
 	if err == sql.ErrNoRows {
@@ -72,7 +72,7 @@ func (m *UserModel) CreateUser(name string, sale int) (User, error) {
 	//user инициализация данных переданных из контроллера в структуру User
 	var user = User{Name: name, Sale: sale}
 	//создание нового значения используя данные переданных из контроллера с уникальным id
-	err := m.DB.QueryRow("INSERT INTO Misha2 (name, sale) VALUES($1,$2) returning id", user.Name, user.Sale).Scan(&user.ID)
+	err := m.dataBase.QueryRow("INSERT INTO Misha2 (name, sale) VALUES($1,$2) returning id", user.Name, user.Sale).Scan(&user.ID)
 	if err != nil {
 		err = fmt.Errorf("Ошибка создания строки %s", err)
 		return user, err
@@ -86,13 +86,13 @@ func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
 	user := User{ID: id, Name: name, Sale: sale}
 	fmt.Println("Печать из модели", id, name, sale)
 	//изменения в БД значений при совпадении id
-	row1 := m.DB.QueryRow("SELECT id FROM Misha2 where id=$1", user.ID)
+	row1 := m.dataBase.QueryRow("SELECT id FROM Misha2 where id=$1", user.ID)
 	err := row1.Scan(&user.ID)
 	if err == sql.ErrNoRows {
 		err = fmt.Errorf("Нет такого id=%d", id)
 		return user, err
 	} else {
-		_, err := m.DB.Exec("update Misha2 set name =$1, sale= $2 where id = $3", user.Name, user.Sale, user.ID)
+		_, err := m.dataBase.Exec("update Misha2 set name =$1, sale= $2 where id = $3", user.Name, user.Sale, user.ID)
 		if err != nil {
 			err = fmt.Errorf("Нет такого id=%d", user.ID)
 		}
@@ -104,7 +104,7 @@ func (m *UserModel) UpdateUser(id int, name string, sale int) (User, error) {
 func (m *UserModel) DeleteUser(id int) (User, error) {
 	var s *string
 	//row1 нахождение строки с id переданного из контроллера
-	row1 := m.DB.QueryRow("SELECT FROM Misha2 where id=$1", id)
+	row1 := m.dataBase.QueryRow("SELECT FROM Misha2 where id=$1", id)
 	err := row1.Scan(&s)
 	if err == sql.ErrNoRows {
 		err = fmt.Errorf("Нет такого id=%d", id)
@@ -112,7 +112,7 @@ func (m *UserModel) DeleteUser(id int) (User, error) {
 	} else {
 		var k string
 		//удаление строки в случае нахождения данной строки
-		row := m.DB.QueryRow("DELETE  FROM Misha2 where id=$1", id)
+		row := m.dataBase.QueryRow("DELETE  FROM Misha2 where id=$1", id)
 		err = row.Scan(&k)
 		if err == sql.ErrNoRows {
 			err = fmt.Errorf("Ошибка удаления строки из БД %s", err)

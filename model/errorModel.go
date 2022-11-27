@@ -13,20 +13,20 @@ type Error struct {
 
 // UserModel используется для конструктора модели
 type ErrorModel struct {
-	DB *sql.DB
+	dataBase *sql.DB
 }
 
 // NewUserModel конструктор модели возвращающий указатель на структуру ErrorModel
 func NewErrorModel(DB *sql.DB) *ErrorModel {
 	return &ErrorModel{
-		DB: DB,
+		dataBase: DB,
 	}
 }
 
 // GetErrorById метод модели по получению всех пользователей из БД возвращает массив структур Error и ошибку
 func (m *ErrorModel) GetErrorById(moduleId int64) ([]Error, error) {
 	//Query запрос возврата срок выборки из таблицы значений значений по id
-	var rows, err = m.DB.Query("SELECT id, title FROM documentations.error where fk_module=$1", moduleId)
+	var rows, err = m.dataBase.Query("SELECT id, title FROM documentations.error where fk_module=$1", moduleId)
 	if err != nil {
 		err := fmt.Errorf("Ошибка в выбора таблицы %s ", err)
 		return nil, err

@@ -18,7 +18,7 @@ type ErrorController struct {
 
 // NewErrorModel конструктор контроллера, возращающий экземпляр структуры ErrorController
 // со свойством users контроллера модели с аргументом DB
-func NewErrorModel(DB *sql.DB) *ErrorController {
+func NewErrorController(DB *sql.DB) *ErrorController {
 	return &ErrorController{
 		model: model.NewErrorModel(DB),
 	}
