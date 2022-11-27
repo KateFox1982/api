@@ -22,9 +22,11 @@ type DocumentModel struct {
 // NewUserModel конструктор модели возвращающий указатель на структуру DocumentModel
 func NewDocumentModel(DB *sql.DB) *DocumentModel {
 	return &DocumentModel{
-		dataBase:    DB,
+		dataBase: DB,
+		//обращение к конструктору модели Module
 		moduleModel: NewModuleModel(DB),
-		errorModel:  NewErrorModel(DB),
+		//обращение к конструктору модели Error
+		errorModel: NewErrorModel(DB),
 	}
 }
 
@@ -53,24 +55,32 @@ func (m *DocumentModel) GetDocuments() ([]Document, error) {
 	//возврат массива структур и ошибки
 	return document, err
 }
+
+// GetDocumentsFull получение вложенных типов Module и Error в Documents
 func (m *DocumentModel) GetDocumentsFull() ([]Document, error) {
+	//инициализация перемееной doc являющейся экземпляром структруры Document
 	var doc = []Document{}
+	//вызов метода GetDocuments для получения всех документов
 	doc, err := m.GetDocuments()
 	if err != nil {
 		err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
 		return []Document{}, err
 	}
+	//Цикл range для передобра значений структуры Document
 	for i := range doc {
+		//определение id Document
 		docId := doc[i].Id
+		//доступ к полю Моdule экземпляра структуры Document c уникальным ключом и изменению его значению
 		doc[i].Modules, err = m.moduleModel.GetModuleById(docId)
 		if err != nil {
 			err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
 			return []Document{}, err
 		}
+		//Цикл range для передобра значений структуры Module
 		for k := range doc[i].Modules {
-
+			//определение id Module
 			moduleId := doc[i].Modules[k].Id
-			//var errorModel []Error
+			//доступ к полю Error экземпляра структуры Module c уникальным ключом и изменению его значению
 			doc[i].Modules[k].Errors, err = m.errorModel.GetErrorById(moduleId)
 			if err != nil {
 				err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
