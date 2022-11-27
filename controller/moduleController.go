@@ -18,7 +18,7 @@ type ModuleController struct {
 
 // NewModuleModel конструктор контроллера, возращающий экземпляр структуры ModuleController
 // со свойством model контроллера модели с аргументом DB
-func NewModuleModelController(DB *sql.DB) *ModuleController {
+func NewModuleController(DB *sql.DB) *ModuleController {
 	return &ModuleController{
 		model: model.NewModuleModel(DB),
 	}

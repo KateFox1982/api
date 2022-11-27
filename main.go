@@ -72,7 +72,7 @@ func main() {
 	//и методом GET, созадет новый экземпляр конструктора
 	//контроллера с аргументом DB, прием-передача параметров функции контроллера GetModuleById
 	router.HandleFunc("/module/{id}", func(res http.ResponseWriter, req *http.Request) {
-		userCtrl := controller.NewModuleModelController(DB)
+		userCtrl := controller.NewModuleController(DB)
 		userCtrl.GetModuleById(res, req)
 	}).Methods("GET")
 	//router.HandleFunc регистрация второго маршрута, с URL оканчивающимся на "/error и параметром id, который пользователь указывает в URL,

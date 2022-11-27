@@ -58,7 +58,7 @@ func (m *DocumentModel) GetDocuments() ([]Document, error) {
 
 // GetDocumentsFull получение вложенных типов Module и Error в Documents
 func (m *DocumentModel) GetDocumentsFull() ([]Document, error) {
-	//инициализация перемееной doc являющейся экземпляром структруры Document
+	//инициализация переменной doc являющейся экземпляром структруры Document
 	var doc = []Document{}
 	//вызов метода GetDocuments для получения всех документов
 	doc, err := m.GetDocuments()
@@ -73,7 +73,7 @@ func (m *DocumentModel) GetDocumentsFull() ([]Document, error) {
 		//доступ к полю Моdule экземпляра структуры Document c уникальным ключом и изменению его значению
 		doc[i].Modules, err = m.moduleModel.GetModuleById(docId)
 		if err != nil {
-			err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
+			err := fmt.Errorf("ошибка функции GetModuleById селекта %s", err)
 			return []Document{}, err
 		}
 		//Цикл range для передобра значений структуры Module
@@ -83,7 +83,7 @@ func (m *DocumentModel) GetDocumentsFull() ([]Document, error) {
 			//доступ к полю Error экземпляра структуры Module c уникальным ключом и изменению его значению
 			doc[i].Modules[k].Errors, err = m.errorModel.GetErrorById(moduleId)
 			if err != nil {
-				err := fmt.Errorf("ошибка сканирования результата селекта %s", err)
+				err := fmt.Errorf("ошибка функции GetErrorById %s", err)
 				return []Document{}, err
 			}
 
