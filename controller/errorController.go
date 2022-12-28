@@ -27,25 +27,46 @@ func NewErrorController(DB *sql.DB) *ErrorController {
 // GetErrorById метод контроллера по получModuения всех значений из БД
 func (dc *ErrorController) GetErrorById(res http.ResponseWriter, req *http.Request) {
 	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
-	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set(
+		"Content-Type",
+		"application/json",
+	)
 	//изъятия из заголовка URL id string
 	params := mux.Vars(req) // we are extracting 'id' of the Course which we are passing in the url
 
 	var id = params["id"]
 	//конвертация string в int
-	s, err := strconv.ParseInt(id, 10, 64)
+	s, err := strconv.ParseInt(
+		id,
+		10,
+		64,
+	)
 	if err != nil {
 		m := "Ошибка перевода id из string в int64 "
-		fmt.Println(m, err)
-		fmt.Fprintf(res, m, err)
+		fmt.Println(
+			m,
+			err,
+		)
+		fmt.Fprintf(
+			res,
+			m,
+			err,
+		)
 		return
 	}
 	//передача парметра id методу модели GetErrorById
 	p, err := dc.model.GetErrorById(s)
 	if err != nil {
 		m := "Ошибка выполнения функции выбора по id: "
-		fmt.Println(m, err)
-		fmt.Fprintf(res, m, err)
+		fmt.Println(
+			m,
+			err,
+		)
+		fmt.Fprintf(
+			res,
+			m,
+			err,
+		)
 		return
 	}
 	//кодирование в json результата выполнения метода и передача в пакет main

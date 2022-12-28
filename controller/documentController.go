@@ -30,7 +30,6 @@ func (dc *DocumentController) GetDocuments(res http.ResponseWriter, req *http.Re
 	//установливаем заголовок «Content-Type: application/json», т.к. потому что мы отправляем данные JSON с запросом через роутер
 	res.Header().Set("Content-Type", "application/json")
 	//обращение к методу модели Getusers
-	fmt.Println("Pfgecnbkcz")
 	documents, err := dc.model.GetDocuments()
 	if err != nil {
 		m := "Ошибка выполнеия функции получения информации о всех пользователях: %s"
