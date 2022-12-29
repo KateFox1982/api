@@ -2,14 +2,9 @@ package model
 
 import (
 	"database/sql"
+	. "example.com/projectApiClient"
 	"fmt"
 )
-
-// User структура используется инициализации данные в структуры
-type Error struct {
-	Id    int64  `json:"id"`
-	Title string `json:"title"`
-}
 
 // UserModel используется для конструктора модели
 type ErrorModel struct {

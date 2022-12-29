@@ -3,15 +3,16 @@ package model
 
 import (
 	"database/sql"
+	. "example.com/projectApiClient"
 	"fmt"
 )
 
-// User структура используется инициализации данные в структуры
-type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Sale int    `json:"sale"`
-}
+//// User структура используется инициализации данные в структуры
+//type User struct {
+//	ID   int    `json:"id"`
+//	Name string `json:"name"`
+//	Sale int    `json:"sale"`
+//}
 
 // UserModel используется для конструктора модели
 type UserModel struct {

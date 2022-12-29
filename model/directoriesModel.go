@@ -1,22 +1,17 @@
 package model
 
 import (
+	. "example.com/projectApiClient"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
 //постоянная с адресом из какой директории надо получить информацию о вложенности
 const path = "/home/kate/Music"
-
-//Directory структура имеющая рекурсионный вид
-type Directory struct {
-	Id          int    `json:"id"`
-	Title       string `json:"title"`
-	Directories []Directory
-}
 
 //DirectoriesModel используется для конструктора модели
 type DirectoriesModel struct {
@@ -29,23 +24,24 @@ func NewDirectoriesModel() *DirectoriesModel {
 }
 
 // GetDirectories метод модели получающий слайс Директорий находящихся по адресу path
-func (dir *DirectoriesModel) GetDirectories(path string) (*[]Directory, error) {
+func (dir *DirectoriesModel) GetDirectories(path string) ([]Directory, error) {
 	//создание экземпляра структуры Directory
 	directories := []Directory{}
-	var fistDirectoryTitle string
+	var firstDirectoryTitle string
 	//разбиение path на слова по разделителю "/"
 	str := strings.Split(path, "/")
+	str = strings.Split(path, "\\")
 	num := 1
 	//длина строки path
 	lastDir := len(str)
 	//цикл для определения "первоначальной" диретории
 	for i := 0; i < lastDir; i++ {
-		fistDirectoryTitle = ``
-		fistDirectory := str[lastDir-1]
-		fistDirectoryTitle = fistDirectoryTitle + fistDirectory
+		firstDirectoryTitle = ``
+		firstDirectory := str[lastDir-1]
+		firstDirectoryTitle = firstDirectoryTitle + firstDirectory
 	}
 	//инициализация данных, полученых выше в структуру Directory
-	directory := Directory{Id: num, Title: fistDirectoryTitle}
+	directory := Directory{Id: num, Title: firstDirectoryTitle}
 	//обращение к рекурсионной функции readDir
 	err := readDir(path, &directory.Directories, num)
 	if err != nil {
@@ -54,7 +50,7 @@ func (dir *DirectoriesModel) GetDirectories(path string) (*[]Directory, error) {
 	}
 	//добавление структуры в слайс структур
 	directories = append(directories, directory)
-	return &directories, nil
+	return directories, nil
 }
 
 //readDir рекурсионная функция необходимая длянахождения всех вложенных Диреторий
@@ -69,7 +65,7 @@ func readDir(path string, directories *[]Directory, num int) error {
 	//цикл для изменения адреса path, определения является ли объект директорией или файлом,
 	//а так е рексурсионным вызовом самой себя, для получения вложенных объектов
 	for _, file := range files {
-		path := path + `/` + file.Name()
+		path := filepath.Join(path, file.Name())
 		fmt.Println("path ", path)
 		if file.IsDir() == true {
 			num = num + 1

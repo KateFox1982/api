@@ -2,15 +2,9 @@ package model
 
 import (
 	"database/sql"
+	. "example.com/projectApiClient"
 	"fmt"
 )
-
-// Module структура используется инициализации данные в структуры
-type Module struct {
-	Id     int64   `json:"id"`
-	Title  string  `json:"title"`
-	Errors []Error `json:"errors"`
-}
 
 // ModuleModel используется для конструктора модели
 type ModuleModel struct {

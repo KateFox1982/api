@@ -9,6 +9,7 @@ import (
 	_ "github.com/lib/pq"
 	"strconv"
 
+	. "example.com/projectApiClient"
 	"my_project/model"
 	"net/http"
 )
@@ -106,7 +107,7 @@ func (usr *UserController) CreateUser(res http.ResponseWriter, req *http.Request
 		"application/json",
 	)
 	//объявление структуры User пакета model
-	var user model.User
+	var user User
 	//декорирование тела запроса в структуру
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
@@ -152,7 +153,7 @@ func (usr *UserController) UpdateUser(res http.ResponseWriter, req *http.Request
 		"application/json",
 	)
 	//объявление структуры User пакета model
-	var user model.User
+	var user User
 	//декорирование тела запроса в структуру
 	err := json.NewDecoder(req.Body).Decode(&user)
 	if err != nil {
